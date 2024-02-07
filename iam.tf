@@ -1,4 +1,3 @@
-
 resource "aws_iam_role" "eks-cluster-role" {
   name = "eks-cluster-${var.ENV}-role"
 
@@ -60,7 +59,6 @@ resource "aws_iam_role_policy_attachment" "node-AmazonEC2ContainerRegistryReadOn
 }
 
 
-
 resource "aws_iam_role" "ssm-role-for-pod" {
   name = "eks-ssm-ps-${var.ENV}-role"
 
@@ -71,12 +69,12 @@ resource "aws_iam_role" "ssm-role-for-pod" {
         {
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.identity.account_id}:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/${data.external.thumb.result.thumbprint}"
+                "Federated": "arn:aws:iam::${data.aws_caller_identity.identity.account_id}:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/${split("/", aws_eks_cluster.eks.identity.0.oidc.0.issuer)[4]}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringEquals": {
-                    "oidc.eks.us-east-1.amazonaws.com/id/${data.external.thumb.result.thumbprint}:aud": "sts.amazonaws.com"
+                    "oidc.eks.us-east-1.amazonaws.com/id/${split("/", aws_eks_cluster.eks.identity.0.oidc.0.issuer)[4]}:aud": "sts.amazonaws.com"
                 }
             }
         }
@@ -84,6 +82,8 @@ resource "aws_iam_role" "ssm-role-for-pod" {
 }
 POLICY
 }
+
+
 
 
 resource "aws_iam_role_policy" "ssm-ps-policy" {
