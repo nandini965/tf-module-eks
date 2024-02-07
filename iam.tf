@@ -78,6 +78,7 @@ resource "aws_iam_role" "ssm-role-for-pod" {
                 }
             }
         }
+
     ]
 }
 POLICY
